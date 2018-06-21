@@ -137,6 +137,7 @@ class PatricaTrieNodeBase
 	}
 
 	/* Interface */
+    // eslint-disable-next-line
 	_findByKey( Key, Exact )
 	{
 		throw new NotImplementedException( '_findByKey' );
