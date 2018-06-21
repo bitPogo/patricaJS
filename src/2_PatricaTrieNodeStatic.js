@@ -383,9 +383,9 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 
 		for ( Child in this._Children )
 		{
-        	if ( null !== this._Children[ Child ] )
-        	{
-            	this._Children[ Child ]._serialize( Output );
+			if ( null !== this._Children[ Child ] )
+			{
+				this._Children[ Child ]._serialize( Output );
 			}
 		}
 
