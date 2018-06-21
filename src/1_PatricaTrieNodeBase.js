@@ -333,7 +333,7 @@ class PatricaTrieNodeBase
 
 		for ( Child in Children )
 		{
-			if ( false === ( Children[ Child ] instanceof PatricaTrieNode ) )
+			if ( false === ( Children[ Child ] instanceof PatricaTrieNodeBase ) )
 			{
 				throw new ValueErrorException( 'Illegal import of non PatricaTrieNode.' );
 			}

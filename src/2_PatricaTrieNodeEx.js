@@ -695,19 +695,6 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
 		Output.push( ']' );
 	}
 
-	serialize( ValueSerializer )
-	{
-		const Output = [];
-		if ( 'function' !== typeof ValueSerializer )
-		{
-			throw new TypeErrorException( 'Expected a function for value serializer.' );
-		}
-
-		this._serialize( ValueSerializer, Output );
-
-		return Output.join( '' );
-	}
-
     _fromString( Nodes, Position, ValueDeserializer )
     {
         let ImportNode;
@@ -731,7 +718,7 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
 
 	static _loadFromString( NodeString, Position, Parent, ValueDeserializer )
     {
-        let lastPosition, KeyLength, Key, ValueLength, Value, Node;
+        let LastPosition, KeyLength, Key, ValueLength, Value, Node;
 
         if ( '[' !== NodeString.charAt( Position ) )
         {
@@ -739,33 +726,33 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
         }
 
         Position++;
-        lastPosition = Position;
+        LastPosition = Position;
         while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
         {
             Position++;
         }
 
-        KeyLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+        KeyLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
 
         if( true === isNaN( KeyLength ) || 0 === KeyLength )
         {
-            throw new ValueErrorException( `Illegal key length @position ${ lastPosition }.` );
+            throw new ValueErrorException( `Illegal key length @position ${ LastPosition }.` );
         }
 
         Position++;
         Key = NodeString.substring( Position, ( Position + KeyLength ) );
         Position += KeyLength;
-        lastPosition = Position;
+        LastPosition = Position;
 
         while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
         {
             Position++;
         }
-        ValueLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+        ValueLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
 
         if( true === isNaN( ValueLength ) )
         {
-            throw new ValueErrorException( `Illegal value length @position ${ lastPosition }.` );
+            throw new ValueErrorException( `Illegal value length @position ${ LastPosition }.` );
         }
 
         if( 0 === ValueLength )

@@ -1,7 +1,6 @@
 /* eslint-disable operator-linebreak */
 export class PatricaStaticTrieEx extends PatricaStaticTrieNodeFx
 {
-	__PositionPointer;
 	constructor( Size, Normalizer )
 	{
 		super( undefined, undefined, Size, Normalizer );
@@ -99,7 +98,7 @@ export class PatricaStaticTrieEx extends PatricaStaticTrieNodeFx
 			return null;
 		}
 		// eslint-disable-next-line
-	Found = this.__Normalizer( Key.charAt( 0 ) );
+		Found = this.__Normalizer( Key.charAt( 0 ) );
 
 		if ( 0 > Found || this.__Size <= Found )
 		{
@@ -125,7 +124,7 @@ export class PatricaStaticTrieEx extends PatricaStaticTrieNodeFx
 			return null;
 		}
 		// eslint-disable-next-line
-	LowerKey = Key.toLowerCase();
+		LowerKey = Key.toLowerCase();
 		Found = this.__Normalizer( LowerKey.charAt( 0 ) );
 
 		if ( -1 < Found && this.__Size > Found )
@@ -384,7 +383,7 @@ export class PatricaStaticTrieEx extends PatricaStaticTrieNodeFx
 	serialize( ValueSerializer )
 	{
 		let Child;
-		const Output = [ '[r', `:${this.__Size}` ];
+		const Output = [ `[r${this.__Size}` ];
 
 		for ( Child in this._Children )
 		{
@@ -395,39 +394,67 @@ export class PatricaStaticTrieEx extends PatricaStaticTrieNodeFx
 		return Output.join( '' );
 	}
 
-	__parser( ValueDeserializer )
+	loadFromString( Trie, Normalizer, ValueDeserializer )
 	{
+		let Length, NewTrie, Position, LastPosition, Size;
+        if ( 'string' !== typeof Trie )
+        {
+            throw new TypeErrorException( 'Expected string to parse.' );
+        }
 
-	}
+        if ( 'function' !== typeof Normalizer )
+        {
+            throw new TypeErrorException( 'Expected function for normalizer.' );
+        }
 
-	loadFromString( Trie, ValueDeserializer )
-	{
-		let Length;
-		if ( 'string' !== typeof Trie )
-		{
-			throw new TypeErrorException( 'Expected string to parse.' );
-		}
+        // eslint-disable-next-line
+        Length = Trie.length;
 
-		if ( 'function' !== typeof ValueDeserializer )
-		{
-			throw new TypeErrorException( 'Expected function for deserialization.' );
-		}
-		// eslint-disable-next-line
-		Length = Trie.length;
+        if ( 3 > Length )
+        {
+            throw new ValueErrorException( 'The given string cannot be valid.' );
+        }
 
-		if ( 3 > Length )
-		{
-			throw new ValueErrorException( 'The given string cannot be valid.' );
-		}
+        if ( '[' !== Trie.charAt( 0 ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
+        }
 
-		if ( '[' !== Trie.charAt( 0 ) )
-		{
-			throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
-		}
+        if ( 'r' !== Trie.charAt( 1 ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
+        }
 
-		if ( 'r' !== Trie.charAt( 1 ) )
-		{
-			throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
-		}
+        Position = 2;
+        LastPosition = 2;
+
+        while( 47 < Trie.charCodeAt( Position ) && 58 > Trie.charCodeAt( Position ) )
+        {
+            Position++;
+        }
+
+        Size = parseInt( Trie.substring( LastPosition, ( Position ) ) );
+
+        if( true === isNaN( Size ) || 0 === Size )
+        {
+            throw new ValueErrorException( `Illegal size @position ${ LastPosition }.` );
+        }
+
+        NewTrie = new PatricaStaticTrieEx( Size, Normalizer );
+
+        if( ']' === Trie.charAt( Position ) )
+        {
+            return NewTrie;
+        }
+
+        // eslint-disable-next-line
+        Position = NewTrie._fromString( Trie, Position, Size, Normalizer, ValueDeserializer );
+
+        if( Position !== Length )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
+        }
+
+        return NewTrie;
 	}
 }

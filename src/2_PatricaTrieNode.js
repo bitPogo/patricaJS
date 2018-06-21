@@ -448,15 +448,6 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
         Output.push( ']' );
     }
 
-    serialize()
-    {
-        const Output = [];
-
-        this._serialize( Output );
-
-        return Output.join( '' );
-    }
-
     _fromString( Nodes, Position )
     {
         let ImportNode;
@@ -480,7 +471,7 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 
     static _loadFromString( NodeString, Position, Parent )
     {
-        let lastPosition, KeyLength, Key, Node;
+        let LastPosition, KeyLength, Key, Node;
 
         if ( '[' !== NodeString.charAt( Position ) )
         {
@@ -488,17 +479,17 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
         }
 
         Position++;
-        lastPosition = Position;
+        LastPosition = Position;
         while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
         {
             Position++;
         }
 
-        KeyLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+        KeyLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
 
         if( true === isNaN( KeyLength ) || 0 === KeyLength )
         {
-            throw new ValueErrorException( `Illegal key length @position ${ lastPosition }.` );
+            throw new ValueErrorException( `Illegal key length @position ${ LastPosition }.` );
         }
 
         Position++;

@@ -146,7 +146,7 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 			return;
 		}
 		// eslint-disable-next-line
-	CurrentKey = this._getKey().toLowerCase();
+		CurrentKey = this._getKey().toLowerCase();
 
 		if ( true === CurrentKey.startsWith( LowerKey ) )
 		{
@@ -383,35 +383,28 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 
         for ( Child in this._Children )
         {
-            this._Children[ Child ]._serialize( Output );
+        	if( null !== this._Children[ Child ] )
+        	{
+            	this._Children[ Child ]._serialize( Output );
+            }
         }
 
         Output.push( ']' );
     }
 
-    serialize()
-    {
-        const Output = [];
-
-        this._serialize( Output );
-
-        return Output.join( '' );
-    }
-
     _fromString( Nodes, Position, Size, Normalizer )
     {
         let ImportNode;
-        let Imports = [];
+        let Imports = new Array( Size );
 
         while( Nodes.length > Position )
         {
             ImportNode = PatricaStaticTrieNode._loadFromString( Nodes, Position, this, Size, Normalizer );
             Position = ImportNode[ 0 ];
-            Imports.push( ImportNode[ 1 ] );
+            Imports[ Normalizer( ImportNode[ 1 ]._getKey().charAt( 0 ) ) ] = ImportNode;
             if( ']' === Nodes.charAt( Position ) )
             {
                 this._importChildren( Imports );
-                this._Children = this._Children.sort( PatricaTrieNodeBase.sortChildes );
                 return ( ++Position )
             }
         }
@@ -421,7 +414,7 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 
     static _loadFromString( NodeString, Position, Parent, Size, Normalizer )
     {
-        let lastPosition, KeyLength, Key, Node;
+        let LastPosition, KeyLength, Key, Node;
 
         if ( '[' !== NodeString.charAt( Position ) )
         {
@@ -429,17 +422,17 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
         }
 
         Position++;
-        lastPosition = Position;
+        LastPosition = Position;
         while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
         {
             Position++;
         }
 
-        KeyLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+        KeyLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
 
         if( true === isNaN( KeyLength ) || 0 === KeyLength )
         {
-            throw new ValueErrorException( `Illegal key length @position ${ lastPosition }.` );
+            throw new ValueErrorException( `Illegal key length @position ${ LastPosition }.` );
         }
 
         Position++;

@@ -1,9 +1,6 @@
 /* eslint-disable operator-linebreak */
-
 export class PatricaTrie extends PatricaTrieNode
 {
-	__PositionPointer;
-
 	constructor()
 	{
 		super( undefined, undefined );

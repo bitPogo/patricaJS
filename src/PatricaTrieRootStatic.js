@@ -1,7 +1,6 @@
 /* eslint-disable operator-linebreak */
 export class PatricaTrieStatic extends PatricaStaticTrieNode
 {
-	__PositionPointer;
 	constructor( Size, Normalizer )
 	{
 		super( undefined, undefined, Size, Normalizer );
@@ -190,7 +189,7 @@ export class PatricaTrieStatic extends PatricaStaticTrieNode
 	serialize()
 	{
 		let Child;
-		const Output = [ '[r', `:${this.__Size}` ];
+		const Output = [ `[r${this.__Size}` ];
 
 		for ( Child in this._Children )
 		{
@@ -201,30 +200,67 @@ export class PatricaTrieStatic extends PatricaStaticTrieNode
 		return Output.join( '' );
 	}
 
-	loadFromString( Trie )
+	loadFromString( Trie, Normalizer )
 	{
-		let Length;
-		this.__PositionPointer = 0;
-		if ( 'string' !== typeof Trie )
-		{
-			throw new TypeErrorException( 'Expected string to parse.' );
-		}
-		// eslint-disable-next-line
-		Length = Trie.length;
+        let Length, NewTrie, Position, LastPosition, Size;
+        if ( 'string' !== typeof Trie )
+        {
+            throw new TypeErrorException( 'Expected string to parse.' );
+        }
 
-		if ( 3 > Length )
-		{
-			throw new ValueErrorException( 'The given string cannot be valid.' );
-		}
+        if ( 'function' !== typeof Normalizer )
+        {
+            throw new TypeErrorException( 'Expected function for normalizer.' );
+        }
 
-		if ( '[' !== Trie.charAt( 0 ) )
-		{
-			throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
-		}
+        // eslint-disable-next-line
+        Length = Trie.length;
 
-		if ( 'r' !== Trie.charAt( 1 ) )
-		{
-			throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
-		}
-	}
+        if ( 3 > Length )
+        {
+            throw new ValueErrorException( 'The given string cannot be valid.' );
+        }
+
+        if ( '[' !== Trie.charAt( 0 ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
+        }
+
+        if ( 'r' !== Trie.charAt( 1 ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
+        }
+
+        Position = 2;
+        LastPosition = 2;
+
+        while( 47 < Trie.charCodeAt( Position ) && 58 > Trie.charCodeAt( Position ) )
+        {
+            Position++;
+        }
+
+        Size = parseInt( Trie.substring( LastPosition, ( Position ) ) );
+
+        if( true === isNaN( Size ) || 0 === Size )
+        {
+            throw new ValueErrorException( `Illegal size @position ${ LastPosition }.` );
+        }
+
+        NewTrie = new PatricaStaticTrie( Size, Normalizer );
+
+        if( ']' === Trie.charAt( Position ) )
+        {
+            return NewTrie;
+        }
+
+        // eslint-disable-next-line
+        Position = NewTrie._fromString( Trie, Position, Size, Normalizer );
+
+        if( Position !== Length )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
+        }
+
+        return NewTrie;
+    }
 }
