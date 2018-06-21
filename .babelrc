@@ -1,0 +1,35 @@
+{
+  "presets": [
+    "stage-0",
+    "stage-1",
+    "stage-2",
+    "stage-3",
+    "babel-preset-es2015",
+    "babel-preset-es2016",
+    "babel-preset-es2017",
+    ["env", {
+      "modules": false,
+      "targets": {
+        "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+      }
+    }]
+  ],
+  "plugins": [
+    [
+      "groundskeeper-willie",
+      {
+        "removeConsole":  false,
+        "removeDebugger": true,
+        "removePragma":   true
+      },
+      "transform-runtime",
+      [ "transform-class-properties", { "spec": true } ]
+    ]
+  ],
+  "env": {
+    "test": {
+      "presets": [ "env", "stage-3", "babel-preset-es2017" ],
+      "plugins": [ ["transform-class-properties", { "spec": true }] ]
+    }
+  }
+}
