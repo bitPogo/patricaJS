@@ -381,14 +381,14 @@ export class PatricaStaticTrieEx extends PatricaStaticTrieNodeFx
 		}
 	}
 
-	toString( ValueSerializer )
+	serialize( ValueSerializer )
 	{
 		let Child;
-		const Output = [ '[r', this._Children.length ];
+		const Output = [ '[r', `:${this.__Size}` ];
 
 		for ( Child in this._Children )
 		{
-			this._Children[ Child ]._toString( ValueSerializer, Output );
+			this._Children[ Child ]._serialize( ValueSerializer, Output );
 		}
 		Output.push( ']' );
 

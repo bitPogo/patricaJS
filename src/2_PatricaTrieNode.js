@@ -420,8 +420,39 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 		}
 	}
 
-	clear()
+    erase()
 	{
 		this._Children = [];
 	}
+
+    _serialize( Output )
+    {
+        let Child;
+
+        Output.push( `[${this._getKey().length}:${this._getKey()}` );
+        if ( true === this._IsEnding )
+        {
+            Output.push( ':1' );
+        }
+        else
+        {
+            Output.push( ':0' );
+        }
+
+        for ( Child in this._Children )
+        {
+            this._Children[ Child ]._serialize( Output );
+        }
+
+        Output.push( ']' );
+    }
+
+    serialize()
+    {
+        const Output = [];
+
+        this._serialize( Output );
+
+        return Output.join( '' );
+    }
 }

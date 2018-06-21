@@ -634,11 +634,11 @@ export class PatricaStaticTrieNodeFx extends PatricaStaticTrieNode
 		}
 	}
 
-	_toString( ValueSerializer, Output )
+	_serialize( ValueSerializer, Output )
 	{
 		let Value, Child;
 
-		Output.push( `[${this._getKey().length}:${this._getKey()}` );
+		Output.push( `[${this.__Size}:${this._getKey().length}:${this._getKey()}` );
 		if ( true === this._IsEnding )
 		{
 			Value = ValueSerializer( this.__Value );
@@ -646,18 +646,18 @@ export class PatricaStaticTrieNodeFx extends PatricaStaticTrieNode
 		}
 		else
 		{
-			Output.push( ':0' );
+			Output.push( `0` );
 		}
 
 		for ( Child in this._Children )
 		{
-			this._Children[ Child ]._toString( ValueSerializer, Output );
+			this._Children[ Child ]._serialize( ValueSerializer, Output );
 		}
 
 		Output.push( ']' );
 	}
 
-	toString( ValueSerializer )
+	serialize( ValueSerializer )
 	{
 		const Output = [];
 		if ( 'function' !== typeof ValueSerializer )
@@ -665,7 +665,7 @@ export class PatricaStaticTrieNodeFx extends PatricaStaticTrieNode
 			throw new TypeErrorException( 'Expected a function for value serializer.' );
 		}
 
-		this._toString( ValueSerializer, Output );
+		this._serialize( ValueSerializer, Output );
 
 		return Output.join( '' );
 	}

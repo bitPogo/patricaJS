@@ -460,28 +460,23 @@ export class PatricaTrieEx extends PatricaTrieNodeEx
 		}
 	}
 
-	toString( ValueSerializer )
+	serialize( ValueSerializer )
 	{
 		let Child;
-		const Output = [ '[r', this._Children.length ];
+		const Output = [ '[r' ];
 
 		for ( Child in this._Children )
 		{
-			this._Children[ Child ]._toString( ValueSerializer, Output );
+			this._Children[ Child ]._serialize( ValueSerializer, Output );
 		}
 		Output.push( ']' );
 
 		return Output.join( '' );
 	}
 
-	__parser( ValueDeserializer )
+	static loadFromString( Trie, ValueDeserializer )
 	{
-
-	}
-
-	loadFromString( Trie, ValueDeserializer )
-	{
-		let Length;
+		let Length, NewTrie, Position;
 		if ( 'string' !== typeof Trie )
 		{
 			throw new TypeErrorException( 'Expected string to parse.' );
@@ -508,5 +503,22 @@ export class PatricaTrieEx extends PatricaTrieNodeEx
 		{
 			throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
 		}
+
+		NewTrie = new PatricaTrieEx();
+
+		if( ']' === Trie.charAt( 2 ) )
+		{
+			return NewTrie;
+		}
+
+        // eslint-disable-next-line
+        Position = NewTrie._fromString( Trie, 2, ValueDeserializer );
+
+		if( Position !== Length )
+		{
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
+		}
+
+		return NewTrie;
 	}
 }

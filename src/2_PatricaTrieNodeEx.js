@@ -615,7 +615,7 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
 			1 === this._Children.length
 		&&
 			false === this._Children[ 0 ].hasChildren()
-	&&
+	    &&
 			false === this._IsEnding
 		)
 		{
@@ -672,7 +672,7 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
 		}
 	}
 
-	_toString( ValueSerializer, Output )
+	_serialize( ValueSerializer, Output )
 	{
 		let Value, Child;
 
@@ -684,18 +684,18 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
 		}
 		else
 		{
-			Output.push( ':0' );
+			Output.push( '0' );
 		}
 
 		for ( Child in this._Children )
 		{
-			this._Children[ Child ]._toString( ValueSerializer, Output );
+			this._Children[ Child ]._serialize( ValueSerializer, Output );
 		}
 
 		Output.push( ']' );
 	}
 
-	toString( ValueSerializer )
+	serialize( ValueSerializer )
 	{
 		const Output = [];
 		if ( 'function' !== typeof ValueSerializer )
@@ -703,8 +703,91 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
 			throw new TypeErrorException( 'Expected a function for value serializer.' );
 		}
 
-		this._toString( ValueSerializer, Output );
+		this._serialize( ValueSerializer, Output );
 
 		return Output.join( '' );
 	}
+
+    _fromString( Nodes, Position, ValueDeserializer )
+    {
+        let ImportNode;
+        let Imports = [];
+
+        while( Nodes.length > Position )
+        {
+            ImportNode = PatricaTrieNodeEx._loadFromString( Nodes, Position, this, ValueDeserializer );
+            Position = ImportNode[ 0 ];
+            Imports.push( ImportNode[ 1 ] );
+            if( ']' === Nodes.charAt( Position ) )
+            {
+                this._importChildren( Imports );
+                this._Children = this._Children.sort( PatricaTrieNodeBase.sortChildes );
+                return ( ++Position )
+            }
+        }
+
+        throw new ValueErrorException( `Unexpected end of string @position ${ Position }.` );
+    }
+
+	static _loadFromString( NodeString, Position, Parent, ValueDeserializer )
+    {
+        let lastPosition, KeyLength, Key, ValueLength, Value, Node;
+
+        if ( '[' !== NodeString.charAt( Position ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ NodeString.charAt( Position ) } at position ${ Position }.` );
+        }
+
+        Position++;
+        lastPosition = Position;
+        while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
+        {
+            Position++;
+        }
+
+        KeyLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+
+        if( true === isNaN( KeyLength ) || 0 === KeyLength )
+        {
+            throw new ValueErrorException( `Illegal key length @position ${ lastPosition }.` );
+        }
+
+        Position++;
+        Key = NodeString.substring( Position, ( Position + KeyLength ) );
+        Position += KeyLength;
+        lastPosition = Position;
+
+        while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
+        {
+            Position++;
+        }
+        ValueLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+
+        if( true === isNaN( ValueLength ) )
+        {
+            throw new ValueErrorException( `Illegal value length @position ${ lastPosition }.` );
+        }
+
+        if( 0 === ValueLength )
+        {
+            Node = new PatricaTrieNodeEx( Key, null, Parent );
+            Node.unsetEnd();
+        }
+        else
+        {
+            Position++;
+            Value = ValueDeserializer( NodeString.substring( Position, ( Position + ValueLength ) ) );
+            Node = new PatricaTrieNodeEx( Key, Value, Parent );
+            Position += ValueLength;
+        }
+
+        if( ']' !== NodeString.charAt( Position ) )
+        {
+            return [ Node._fromString( NodeString, Position, ValueDeserializer ), Node ];
+        }
+        else
+        {
+            return [ ( ++Position ), Node ];
+        }
+    }
 }

@@ -267,14 +267,14 @@ export class PatricaTrie extends PatricaTrieNode
 		}
 	}
 
-	toString()
+	serialize()
 	{
 		let Child;
-		const Output = [ '[r', this._Children.length ];
+		const Output = [ '[r', `${this._Children.length}:` ];
 
 		for ( Child in this._Children )
 		{
-			this._Children[ Child ]._toString( Output );
+			this._Children[ Child ]._serialize( Output );
 		}
 		Output.push( ']' );
 

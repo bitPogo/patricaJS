@@ -361,9 +361,45 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 		}
 	}
 
-	clear()
+    erase()
 	{
 		this._Children = new Array( this.__Size );
 		this._Children.fill( null );
 	}
+
+    _serialize( ValueSerializer, Output )
+    {
+        let Value, Child;
+
+        Output.push( `[${this.__Size}:${this._getKey().length}:${this._getKey()}` );
+        if ( true === this._IsEnding )
+        {
+            Value = ValueSerializer( this.__Value );
+            Output.push( `${Value.length}:${Value}` );
+        }
+        else
+        {
+            Output.push( `0` );
+        }
+
+        for ( Child in this._Children )
+        {
+            this._Children[ Child ]._serialize( ValueSerializer, Output );
+        }
+
+        Output.push( ']' );
+    }
+
+    serialize( ValueSerializer )
+    {
+        const Output = [];
+        if ( 'function' !== typeof ValueSerializer )
+        {
+            throw new TypeErrorException( 'Expected a function for value serializer.' );
+        }
+
+        this._serialize( ValueSerializer, Output );
+
+        return Output.join( '' );
+    }
 }

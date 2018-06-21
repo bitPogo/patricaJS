@@ -187,14 +187,14 @@ export class PatricaTrieStatic extends PatricaStaticTrieNode
 		}
 	}
 
-	toString()
+	serialize()
 	{
 		let Child;
-		const Output = [ '[r', this._Children.length ];
+		const Output = [ '[r', `:${this.__Size}` ];
 
 		for ( Child in this._Children )
 		{
-			this._Children[ Child ]._toString( Output );
+			this._Children[ Child ]._serialize( Output );
 		}
 		Output.push( ']' );
 

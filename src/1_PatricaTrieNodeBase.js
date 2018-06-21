@@ -137,7 +137,7 @@ class PatricaTrieNodeBase
 	}
 
 	/* Interface */
-    // eslint-disable-next-line
+	// eslint-disable-next-line
 	_findByKey( Key, Exact )
 	{
 		throw new NotImplementedException( '_findByKey' );
@@ -342,7 +342,6 @@ class PatricaTrieNodeBase
 		}
 
 		this._Children = Children;
-		// this._Children = this._Children.sort( PatricaTrieNode.sortChildes );
 		return true;
 	}
 
@@ -360,34 +359,13 @@ class PatricaTrieNodeBase
 		throw new NotImplementedException( 'remove' );
 	}
 
-	_toString( Output )
+	erase()
 	{
-		let Child;
-
-		Output.push( `[${this._getKey().length}:${this._getKey()}` );
-		if ( true === this._IsEnding )
-		{
-			Output.push( ':1' );
-		}
-		else
-		{
-			Output.push( ':0' );
-		}
-
-		for ( Child in this._Children )
-		{
-			this._Children[ Child ]._toString( Output );
-		}
-
-		Output.push( ']' );
+        throw new NotImplementedException( 'erase' );
 	}
 
-	toString()
+    serialize()
 	{
-		const Output = [];
-
-		this._toString( Output );
-
-		return Output.join( '' );
+        throw new NotImplementedException( 'serialize' );
 	}
 }

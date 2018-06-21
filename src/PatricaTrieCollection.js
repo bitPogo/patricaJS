@@ -1,7 +1,6 @@
 /* eslint-disable operator-linebreak */
 export class PatricaTrieCollection extends PatricaTrieNodeBase
 {
-
 	constructor( Items )
 	{
 		super();
@@ -97,11 +96,6 @@ export class PatricaTrieCollection extends PatricaTrieNodeBase
 		return this._Children;
 	}
 
-	merge( Collection )
-	{
-
-	}
-
 	isAEnd()
 	{
 		throw new InvalidMethodException( 'isAEnd' );
@@ -143,8 +137,13 @@ export class PatricaTrieCollection extends PatricaTrieNodeBase
 		throw new InvalidMethodException( 'insert' );
 	}
 
-	toString()
+    erase()
 	{
-		throw new InvalidMethodException( 'toString' );
+        throw new InvalidMethodException( 'erase' );
+	}
+
+	serialize()
+	{
+		throw new InvalidMethodException( 'serialize' );
 	}
 }
