@@ -1,0 +1,73 @@
+{
+  "name": "patricaJS",
+  "version": "0.0.1",
+  "description": "A patrica trie libary for javascript - without regex, becx or chai latte.",
+  "dependencies": {
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "browserify": "^16.2.2"
+  },
+  "scripts": {
+    "test": "jest",
+    "compile": "babel --plugins transform-class-properties -p stage-2 src --out-file tmp/main.js --source-maps; babel --plugins transform-class-properties -p stage-2 test --out-dir .test --source-maps;",
+    "babel": "npm run compile; babel -p es2017 tmp/main.js -o tmp/main.bundle.js; browserify tmp/main.bundle.js -o build/main.bundle.js; rm tmp/*js*",
+    "build": "npm run babel; node build/main.js",
+    "assemble": "mv .babelrc .babelrcT; babel --plugins transform-class-properties src --out-file tmp/patrica.js; mv .babelrcT .babelrc",
+    "start": "http-server -p 9000",
+    "dev": "http-server -p 9000",
+    "lint": "eslint --ext .js, src tmp",
+    "fix": "eslint --ext .js, src tmp --fix"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-groundskeeper-willie": "^1.3.2",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-plugin-transform-runtime": "^6.22.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2016": "^6.24.1",
+    "babel-preset-es2017": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-1": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.15.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-config-wikimedia": "^0.5.0",
+    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-loader": "^1.7.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-vue": "^4.5.0",
+    "http-server": "^0.11.1",
+    "jest": "^23.1.0"
+  },
+  "main": "./index.js",
+  "preferGlobal": false,
+  "files": [
+    "LICENSE",
+    "README.md",
+    "index.js"
+  ],
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "transform": {
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+    },
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
+    }
+  },
+  "readmeFilename": "README.md",
+  "license": "MIT"
+}
