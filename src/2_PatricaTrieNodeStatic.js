@@ -1,369 +1,369 @@
 /* eslint-disable operator-linebreak */
 export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 {
-    __Size;
-    __Normalizer;
+	__Size;
+	__Normalizer;
 
-    constructor( Key, Parent, Size, Normalizer )
-    {
-        let IsRoot = false;
-        super();
-        if (
-            'undefined' === typeof Key
-        &&
-            'undefined' === typeof Parent
-        )
-        {
-            IsRoot = true;
-        }
+	constructor( Key, Parent, Size, Normalizer )
+	{
+		let IsRoot = false;
+		super();
+		if (
+			'undefined' === typeof Key
+		&&
+			'undefined' === typeof Parent
+		)
+		{
+			IsRoot = true;
+		}
 
-        this._IsRoot = IsRoot;
+		this._IsRoot = IsRoot;
 
-        if ( false === IsRoot )
-        {
-            if ( true === Utils.isEmpty( Parent ) || false === ( Parent instanceof PatricaStaticTrieNode ) )
-            {
-                throw new TypeErrorException( 'Expected a PatricaTrieNode as Parent.' );
-            }
+		if ( false === IsRoot )
+		{
+			if ( true === Utils.isEmpty( Parent ) || false === ( Parent instanceof PatricaStaticTrieNode ) )
+			{
+				throw new TypeErrorException( 'Expected a PatricaTrieNode as Parent.' );
+			}
 
-            if ( 'string' !== typeof Key || true === Utils.isEmpty( Key ) )
-            {
-                throw new TypeErrorException( 'Expected non empty key.' );
-            }
+			if ( 'string' !== typeof Key || true === Utils.isEmpty( Key ) )
+			{
+				throw new TypeErrorException( 'Expected non empty key.' );
+			}
 
-            this._IsEnding = true;
-        }
-        else
-        {
-            this._IsEnding = false;
-        }
+			this._IsEnding = true;
+		}
+		else
+		{
+			this._IsEnding = false;
+		}
 
-        if ( 'function' !== typeof Normalizer )
-        {
-            throw new TypeErrorException( 'Expected function for normalizing.' );
-        }
+		if ( 'function' !== typeof Normalizer )
+		{
+			throw new TypeErrorException( 'Expected function for normalizing.' );
+		}
 
-        if ( 0 >= Size )
-        {
-            throw new ValueErrorException( 'Expected size greater then zero.' );
-        }
+		if ( 0 >= Size )
+		{
+			throw new ValueErrorException( 'Expected size greater then zero.' );
+		}
 
-        this._setKey( Key );
-        this._setParent( Parent );
-        this._Children = new Array( Size );
-        this._Children.fill( null );
-        this.__Size = Size;
-    }
+		this._setKey( Key );
+		this._setParent( Parent );
+		this._Children = new Array( Size );
+		this._Children.fill( null );
+		this.__Size = Size;
+	}
 
-    getSize()
-    {
-        return this.__Size;
-    }
+	getSize()
+	{
+		return this.__Size;
+	}
 
-    _findByKey( Key, Exact )
-    {
-        let Found;
-        if ( 0 === Key.length )
-        {
-            return null;
-        }
+	_findByKey( Key, Exact )
+	{
+		let Found;
+		if ( 0 === Key.length )
+		{
+			return null;
+		}
 
-        if ( true === this._getKey().startsWith( Key ) )
-        {
-            if ( true === Exact && Key !== this._getKey() )
-            {
-                return null;
-            }
-            else
-            {
-                return this;
-            }
-        }
-        else if ( Key.startsWith( this._getKey() ) )
-        {
-            Key = Key.substring( this._getKey().length );
-            Found = this.__Normalizer( Key.charAt( 0 ) );
-            if( 0 > Found || this.__Size <= Found )
-            {
-                return null
-            }
+		if ( true === this._getKey().startsWith( Key ) )
+		{
+			if ( true === Exact && Key !== this._getKey() )
+			{
+				return null;
+			}
+			else
+			{
+				return this;
+			}
+		}
+		else if ( Key.startsWith( this._getKey() ) )
+		{
+			Key = Key.substring( this._getKey().length );
+			Found = this.__Normalizer( Key.charAt( 0 ) );
+			if ( 0 > Found || this.__Size <= Found )
+			{
+				return null;
+			}
 
-            return this._Children[ Found ]._findByKey( Key, Exact );
-        }
-        else
-        {
-            return null;
-        }
-    }
+			return this._Children[ Found ]._findByKey( Key, Exact );
+		}
+		else
+		{
+			return null;
+		}
+	}
 
-    _findByKeyIgnoreCase( LowerKey, Exact, Return )
-    {
-        let Found, CurrentKey;
-        if ( 0 === LowerKey.length )
-        {
-            return null;
-        }
+	_findByKeyIgnoreCase( LowerKey, Exact, Return )
+	{
+		let Found, CurrentKey;
+		if ( 0 === LowerKey.length )
+		{
+			return null;
+		}
+		// eslint-disable-next-line
+		CurrentKey = this._getKey().toLowerCase();
 
-        CurrentKey = this._getKey().toLowerCase();
+		if ( true === CurrentKey.startsWith( LowerKey ) )
+		{
+			if ( true === Exact && CurrentKey !== LowerKey )
+			{
+				return;
+			}
+			else
+			{
+				Return.push( this );
+				return;
+			}
+		}
+		else if ( LowerKey.startsWith( CurrentKey ) )
+		{
+			LowerKey = LowerKey.substring( this._getKey().length );
+			Found = this.__Normalizer( LowerKey.charAt( 0 ) );
 
-        if ( true === CurrentKey.startsWith( LowerKey ) )
-        {
-            if ( true === Exact && CurrentKey !== LowerKey )
-            {
-                return;
-            }
-            else
-            {
-                Return.push( this );
-                return;
-            }
-        }
-        else if ( LowerKey.startsWith( CurrentKey ) )
-        {
-            LowerKey = LowerKey.substring( this._getKey().length );
-            Found = this.__Normalizer( LowerKey.charAt( 0 ) );
+			if ( -1 < Found && this.__Size > Found )
+			{
+				this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
+			}
 
-            if ( -1 < Found && this.__Size > Found )
-            {
-                this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
-            }
+			Found = this.__Normalizer( LowerKey.charAt( 0 ).toUpperCase() );
 
-            Found = this.__Normalizer( LowerKey.charAt( 0 ).toUpperCase() );
+			if ( -1 < Found && this.__Size > Found )
+			{
+				this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
+			}
+		}
+	}
 
-            if ( -1 < Found && this.__Size > Found )
-            {
-                this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
-            }
-        }
-    }
+	_containsKeyIgnoreCase( LowerKey, Exact = false )
+	{
+		let Return, Found, CurrentKey;
 
-    _containsKeyIgnoreCase( LowerKey, Exact = false )
-    {
-        let Return, Found, CurrentKey;
+		if ( 0 === LowerKey.length )
+		{
+			return;
+		}
+		// eslint-disable-next-line
+	CurrentKey = this._getKey().toLowerCase();
 
-        if ( 0 === LowerKey.length )
-        {
-            return;
-        }
-        // eslint-disable-next-line
-        CurrentKey = this._getKey().toLowerCase();
+		if ( true === CurrentKey.startsWith( LowerKey ) )
+		{
+			if ( true === Exact && CurrentKey !== LowerKey )
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else if ( LowerKey.startsWith( CurrentKey ) )
+		{
+			LowerKey = LowerKey.substring( this._getKey().length );
+			Found = this.__Normalizer( LowerKey.charAt( 0 ) );
 
-        if ( true === CurrentKey.startsWith( LowerKey ) )
-        {
-            if ( true === Exact && CurrentKey !== LowerKey )
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-        else if ( LowerKey.startsWith( CurrentKey ) )
-        {
-            LowerKey = LowerKey.substring( this._getKey().length );
-            Found = this.__Normalizer( LowerKey.charAt( 0 ) );
+			if ( -1 < Found && this.__Size > Found )
+			{
+				Return = this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
+				if ( false === Return )
+				{
+					Found = this.__Normalizer( LowerKey.charAt( 0 ) );
 
-            if ( -1 < Found && this.__Size > Found )
-            {
-                Return = this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
-                if( false === Return )
-                {
-                    Found = this.__Normalizer( LowerKey.charAt( 0 ) );
+					if ( -1 < Found && this.__Size > Found )
+					{
+						return this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
+					}
+				}
 
-                    if ( -1 < Found && this.__Size > Found )
-                    {
-                        return this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
-                    }
-                }
+				return Return;
+			}
+			else
+			{
+				Found = this.__Normalizer( LowerKey.charAt( 0 ) );
 
-                return Return;
-            }
-            else
-            {
-                Found = this.__Normalizer( LowerKey.charAt( 0 ) );
+				if ( -1 < Found && this.__Size > Found )
+				{
+					return this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
+				}
+			}
+		}
 
-                if ( -1 < Found && this.__Size > Found )
-                {
-                    return this._Children[ Found ]._containsKeyIgnoreCase(LowerKey, Exact );
-                }
-            }
-        }
+		return false;
+	}
 
-        return false;
-    }
+	_insertIntoChild( Key )
+	{
+		const Index = this.__Normalizer( Key.charAt( 0 ) );
 
-    _insertIntoChild( Key )
-    {
-        const Index = this.__Normalizer( Key.charAt( 0 ) );
+		if ( -1 < Index && this.__Size > Index )
+		{
+			this._Children[ Index ].insert( Key );
+			return;
+		}
 
-        if ( -1 < Index && this.__Size > Index )
-        {
-            this._Children[ Index ].insert( Key );
-            return;
-        }
+		this._Children.splice( -( Index + 1 ), 0, new PatricaStaticTrieNode( Key, this ) );
+	}
 
-        this._Children.splice( -( Index + 1 ), 0, new PatricaStaticTrieNode( Key, this ) );
-    }
+	insert( Key )
+	{
+		let Common, NewKey, NewChild, NewChild2, Index;
 
-    insert( Key )
-    {
-        let Common, NewKey, NewChild, NewChild2, Index;
+		const NewKeyLength = Key.length;
+		const CurrentKeyLength = this._getKey().length;
+		let PrefixLength;
 
-        const NewKeyLength = Key.length;
-        const CurrentKeyLength = this._getKey().length;
-        let PrefixLength;
+		if ( 'string' !== typeof Key || 0 === Key.length )
+		{
+			return;
+		}
+		// eslint-disable-next-line
+		PrefixLength = this._longestPrefix( Key );
 
-        if ( 'string' !== typeof Key || 0 === Key.length )
-        {
-            return;
-        }
-        // eslint-disable-next-line
-        PrefixLength = this._longestPrefix( Key );
+		if (
+			NewKeyLength === CurrentKeyLength
+		&&
+			PrefixLength === CurrentKeyLength
+		)
+		{
+			this._IsEnding = true;
+		}
+		else
+		{
+			if ( PrefixLength === CurrentKeyLength )
+			{
+				NewKey = Key.substring( PrefixLength );
+				return this._insertIntoChild( NewKey );
+			}
+			else if ( PrefixLength === NewKeyLength )
+			{
+				NewChild = new PatricaStaticTrieNode(
+					this._getKey().substring( PrefixLength ),
+					this,
+					this.__Size,
+					this.__Normalizer
+				);
 
-        if (
-            NewKeyLength === CurrentKeyLength
-        &&
-            PrefixLength === CurrentKeyLength
-        )
-        {
-            this._IsEnding = true;
-        }
-        else
-        {
-            if ( PrefixLength === CurrentKeyLength )
-            {
-                NewKey = Key.substring( PrefixLength );
-                return this._insertIntoChild( NewKey );
-            }
-            else if ( PrefixLength === NewKeyLength )
-            {
-                NewChild = new PatricaStaticTrieNode(
-                    this._getKey().substring( PrefixLength ),
-                    this,
-                    this.__Size,
-                    this.__Normalizer
-                );
+				NewChild._importChildren( this._Children );
 
-                NewChild._importChildren( this._Children );
+				if ( false === this._IsEnding )
+				{
+					this._IsEnding = true;
+					NewChild.unsetEnd();
+				}
+				this._setKey( this._getKey().substring( 0, PrefixLength ) );
+				this._Children = new Array( this.__Size );
 
-                if ( false === this._IsEnding )
-                {
-                    this._IsEnding = true;
-                    NewChild.unsetEnd();
-                }
-                this._setKey( this._getKey().substring( 0, PrefixLength ) );
-                this._Children = new Array( this.__Size );
+				Index = this.__Normalizer( NewChild._getKey().charAt( 0 ) );
+				this._Children[ Index ] = NewChild;
+			}
+			else
+			{
+				Common = this._getKey().substring( 0, PrefixLength );
+				NewChild = new PatricaStaticTrieNode(
+					this._getKey().substring( PrefixLength ),
+					this,
+					this.__Size,
+					this.__Normalizer
+				);
 
-                Index = this.__Normalizer( NewChild._getKey().charAt( 0 ) );
-                this._Children[ Index ] = NewChild;
-            }
-            else
-            {
-                Common = this._getKey().substring( 0, PrefixLength );
-                NewChild = new PatricaStaticTrieNode(
-                    this._getKey().substring( PrefixLength ),
-                    this,
-                    this.__Size,
-                    this.__Normalizer
-                );
+				NewChild2 = new PatricaStaticTrieNode(
+					Key.substring( PrefixLength ),
+					this,
+					this.__Size,
+					this.__Normalizer
+				);
 
-                NewChild2 = new PatricaStaticTrieNode(
-                    Key.substring( PrefixLength ),
-                    this,
-                    this.__Size,
-                    this.__Normalizer
-                );
+				NewChild._importChildren( this._Children );
 
-                NewChild._importChildren( this._Children );
+				if ( false === this._IsEnding )
+				{
+					NewChild.unsetEnd();
+				}
 
-                if ( false === this._IsEnding )
-                {
-                    NewChild.unsetEnd();
-                }
+				this._IsEnding = false;
+				this._setKey( Common );
+				this._Children = new Array( this.__Size );
 
-                this._IsEnding = false;
-                this._setKey( Common );
-                this._Children = new Array( this.__Size );
+				Index = this.__Normalizer( NewChild._getKey().charAt( 0 ) );
+				this._Children[ Index ] = NewChild;
 
-                Index = this.__Normalizer( NewChild._getKey().charAt( 0 ) );
-                this._Children[ Index ] = NewChild;
+				Index = this.__Normalizer( NewChild2._getKey().charAt( 0 ) );
+				this._Children[ Index ] = NewChild2;
+			}
+		}
+	}
 
-                Index = this.__Normalizer( NewChild2._getKey().charAt( 0 ) );
-                this._Children[ Index ] = NewChild2;
-            }
-        }
-    }
+	_removeFromTrie()
+	{
+		this._getParent()._clean( this._getKey().charCodeAt( 0 ) );
+	}
 
-    _removeFromTrie()
-    {
-        this._getParent()._clean( this._getKey().charCodeAt( 0 ) );
-    }
+	_clean( Key )
+	{
+		const Index = this.__Normalizer( Key );
+		if ( 0 > Index && this.__Size <= Index )
+		{
+			return;
+		}
 
-    _clean( Key )
-    {
-        const Index = this.__Normalizer( Key )
-        if ( 0 > Index && this.__Size <= Index )
-        {
-            return;
-        }
+		this._Children[ Index ] = null;
 
-        this._Children[ Index ] = null;
+		if ( true === this._IsRoot )
+		{
+			return;
+		}
 
-        if ( true === this._IsRoot )
-        {
-            return;
-        }
+		if (
+			0 === this._Children.length
+		&&
+			false === this._IsEnding
+		&&
+			0 < this._getKey().length
+		)
+		{
+			this._removeFromTrie();
+		}
+		else if (
+			1 === this._Children.length
+		&&
+			false === this._Children[ 0 ].hasChildren()
+		&&
+			false === this._IsEnding
+		)
+		{
+			this._setKey( this._getKey() + this._Children[ 0 ]._getKey() );
+			this._IsEnding = this._Children[ 0 ].isAEnd();
+			this._Children[ 0 ] = null;
+		}
+	}
 
-        if (
-            0 === this._Children.length
-        &&
-            false === this._IsEnding
-        &&
-            0 < this._getKey().length
-        )
-        {
-            this._removeFromTrie();
-        }
-        else if (
-            1 === this._Children.length
-        &&
-            false === this._Children[ 0 ].hasChildren()
-        &&
-            false === this._IsEnding
-        )
-        {
-            this._setKey( this._getKey() + this._Children[ 0 ]._getKey() );
-            this._IsEnding = this._Children[ 0 ].isAEnd();
-            this._Children[ 0 ] = null;
-        }
-    }
+	remove( Key, Prefixed = false )
+	{
+		const ToDelete = this.findByKey( Key, Prefixed, true );
 
-    remove( Key, Prefixed = false )
-    {
-        let ToDelete = this.findByKey( Key, Prefixed, true );
+		if ( null === ToDelete )
+		{
+			return;
+		}
 
-        if ( null === ToDelete )
-        {
-            return;
-        }
+		if ( true === ToDelete.hasChildren() )
+		{
+			if ( true === ToDelete.isAEnd() )
+			{
+				ToDelete.unsetEnd();
+			}
+		}
+		else
+		{
+			ToDelete._removeFromTrie();
+		}
+	}
 
-        if ( true === ToDelete.hasChildren() )
-        {
-            if ( true === ToDelete.isAEnd() )
-            {
-                ToDelete.unsetEnd();
-            }
-        }
-        else
-        {
-            ToDelete._removeFromTrie();
-        }
-    }
-
-    clear()
-    {
-        this._Children = new Array( this.__Size );
-        this._Children.fill( null );
-    }
+	clear()
+	{
+		this._Children = new Array( this.__Size );
+		this._Children.fill( null );
+	}
 }

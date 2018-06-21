@@ -52,7 +52,6 @@ console.log( Trie );
 Utils.debugObjectPrint( Trie.toString( JSON.stringify ) );
 Utils.debugObjectPrint( Trie2.toString( JSON.stringify ) );
 
-
 Trie3.insert( '121', 'a' );
 Trie3.insert( '11', 'b' );
 Trie3.insert( '12', 'c' );
