@@ -280,46 +280,47 @@ export class PatricaTrie extends PatricaTrieNode
 	}
 
 	static loadFromString( Trie )
-    {
-        let Length, NewTrie, Position;
-        if ( 'string' !== typeof Trie )
-        {
-            throw new TypeErrorException( 'Expected string to parse.' );
-        }
+	{
+		let Length, NewTrie, Position;
+		if ( 'string' !== typeof Trie )
+		{
+			throw new TypeErrorException( 'Expected string to parse.' );
+		}
 
-        // eslint-disable-next-line
+		// eslint-disable-next-line
         Length = Trie.length;
 
-        if ( 3 > Length )
-        {
-            throw new ValueErrorException( 'The given string cannot be valid.' );
-        }
+		if ( 3 > Length )
+		{
+			throw new ValueErrorException( 'The given string cannot be valid.' );
+		}
 
-        if ( '[' !== Trie.charAt( 0 ) )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
-        }
+		if ( '[' !== Trie.charAt( 0 ) )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
+		}
 
-        if ( 'r' !== Trie.charAt( 1 ) )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
-        }
+		if ( 'r' !== Trie.charAt( 1 ) )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
+		}
 
-        NewTrie = new PatricaTrie();
+		// eslint-disable-next-line
+		NewTrie = new PatricaTrie();
 
-        if( ']' === Trie.charAt( 2 ) )
-        {
-            return NewTrie;
-        }
+		if ( ']' === Trie.charAt( 2 ) )
+		{
+			return NewTrie;
+		}
 
-        // eslint-disable-next-line
+		// eslint-disable-next-line
         Position = NewTrie._fromString( Trie, 2 );
 
-        if( Position !== Length )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
-        }
+		if ( Position !== Length )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
+		}
 
-        return NewTrie;
-    }
+		return NewTrie;
+	}
 }

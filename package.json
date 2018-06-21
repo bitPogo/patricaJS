@@ -11,7 +11,7 @@
     "compile": "babel --plugins transform-class-properties -p stage-2 src --out-file tmp/main.js --source-maps; babel --plugins transform-class-properties -p stage-2 test --out-dir .test --source-maps;",
     "babel": "npm run compile; babel -p es2017 tmp/main.js -o tmp/main.bundle.js; browserify tmp/main.bundle.js -o build/main.bundle.js; rm tmp/*js*",
     "build": "npm run babel; node build/main.js",
-    "assemble": "mv .babelrc .babelrcT; babel --plugins transform-class-properties src --out-file tmp/patrica.js; mv .babelrcT .babelrc",
+    "assemble": "mv .babelrc .babelrcT; babel --plugins transform-class-properties assemble --out-file tmp/patrica.js; mv .babelrcT .babelrc",
     "start": "http-server -p 9000",
     "dev": "http-server -p 9000",
     "lint": "eslint --ext .js, src tmp",

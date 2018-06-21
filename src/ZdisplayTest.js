@@ -52,7 +52,7 @@ console.log( Trie );
 Utils.debugObjectPrint( Trie.getKeysAndValues() );
 Utils.debugObjectPrint( Trie.serialize( JSON.stringify ) );
 
-Trie4 = PatricaTrieEx.loadFromString( Trie.serialize( JSON.stringify ), JSON.parse )
+Trie4 = PatricaTrieEx.loadFromString( Trie.serialize( JSON.stringify ), JSON.parse );
 Utils.debugObjectPrint( Trie4.getKeysAndValues() );
 
 Utils.debugObjectPrint( Trie2.serialize( JSON.stringify ) );
@@ -91,5 +91,3 @@ console.log( Trie3 );
 Utils.debugObjectPrint( Trie3.serialize() );
 Trie4 = PatricaTrie.loadFromString( Trie3.serialize() );
 Utils.debugObjectPrint( Trie4.getKeys() );
-
-

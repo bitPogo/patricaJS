@@ -137,9 +137,9 @@ export class PatricaTrieCollection extends PatricaTrieNodeBase
 		throw new InvalidMethodException( 'insert' );
 	}
 
-    erase()
+	erase()
 	{
-        throw new InvalidMethodException( 'erase' );
+		throw new InvalidMethodException( 'erase' );
 	}
 
 	serialize()

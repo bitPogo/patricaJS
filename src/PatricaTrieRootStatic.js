@@ -202,65 +202,69 @@ export class PatricaTrieStatic extends PatricaStaticTrieNode
 
 	loadFromString( Trie, Normalizer )
 	{
-        let Length, NewTrie, Position, LastPosition, Size;
-        if ( 'string' !== typeof Trie )
-        {
-            throw new TypeErrorException( 'Expected string to parse.' );
-        }
+		let Length, NewTrie, Position, LastPosition, Size;
+		if ( 'string' !== typeof Trie )
+		{
+			throw new TypeErrorException( 'Expected string to parse.' );
+		}
 
-        if ( 'function' !== typeof Normalizer )
-        {
-            throw new TypeErrorException( 'Expected function for normalizer.' );
-        }
+		if ( 'function' !== typeof Normalizer )
+		{
+			throw new TypeErrorException( 'Expected function for normalizer.' );
+		}
 
-        // eslint-disable-next-line
+		// eslint-disable-next-line
         Length = Trie.length;
 
-        if ( 3 > Length )
-        {
-            throw new ValueErrorException( 'The given string cannot be valid.' );
-        }
+		if ( 3 > Length )
+		{
+			throw new ValueErrorException( 'The given string cannot be valid.' );
+		}
 
-        if ( '[' !== Trie.charAt( 0 ) )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
-        }
+		if ( '[' !== Trie.charAt( 0 ) )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
+		}
 
-        if ( 'r' !== Trie.charAt( 1 ) )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
-        }
+		if ( 'r' !== Trie.charAt( 1 ) )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
+		}
 
-        Position = 2;
-        LastPosition = 2;
+		// eslint-disable-next-line
+		Position = 2;
+		// eslint-disable-next-line
+		LastPosition = 2;
 
-        while( 47 < Trie.charCodeAt( Position ) && 58 > Trie.charCodeAt( Position ) )
-        {
-            Position++;
-        }
+		while ( 47 < Trie.charCodeAt( Position ) && 58 > Trie.charCodeAt( Position ) )
+		{
+			Position++;
+		}
 
-        Size = parseInt( Trie.substring( LastPosition, ( Position ) ) );
+		// eslint-disable-next-line
+		Size = parseInt( Trie.substring( LastPosition, ( Position ) ) );
 
-        if( true === isNaN( Size ) || 0 === Size )
-        {
-            throw new ValueErrorException( `Illegal size @position ${ LastPosition }.` );
-        }
+		if ( true === isNaN( Size ) || 0 === Size )
+		{
+			throw new ValueErrorException( `Illegal size @position ${ LastPosition }.` );
+		}
 
-        NewTrie = new PatricaStaticTrie( Size, Normalizer );
+		// eslint-disable-next-line
+		NewTrie = new PatricaStaticTrie( Size, Normalizer );
 
-        if( ']' === Trie.charAt( Position ) )
-        {
-            return NewTrie;
-        }
+		if ( ']' === Trie.charAt( Position ) )
+		{
+			return NewTrie;
+		}
 
-        // eslint-disable-next-line
+		// eslint-disable-next-line
         Position = NewTrie._fromString( Trie, Position, Size, Normalizer );
 
-        if( Position !== Length )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
-        }
+		if ( Position !== Length )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
+		}
 
-        return NewTrie;
-    }
+		return NewTrie;
+	}
 }

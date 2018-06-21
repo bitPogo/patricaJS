@@ -361,11 +361,11 @@ class PatricaTrieNodeBase
 
 	erase()
 	{
-        throw new NotImplementedException( 'erase' );
+		throw new NotImplementedException( 'erase' );
 	}
 
-    serialize()
+	serialize()
 	{
-        throw new NotImplementedException( 'serialize' );
+		throw new NotImplementedException( 'serialize' );
 	}
 }

@@ -695,86 +695,90 @@ export class PatricaTrieNodeEx extends PatricaTrieNode
 		Output.push( ']' );
 	}
 
-    _fromString( Nodes, Position, ValueDeserializer )
-    {
-        let ImportNode;
-        let Imports = [];
+	_fromString( Nodes, Position, ValueDeserializer )
+	{
+		let ImportNode;
+		const Imports = [];
 
-        while( Nodes.length > Position )
-        {
-            ImportNode = PatricaTrieNodeEx._loadFromString( Nodes, Position, this, ValueDeserializer );
-            Position = ImportNode[ 0 ];
-            Imports.push( ImportNode[ 1 ] );
-            if( ']' === Nodes.charAt( Position ) )
-            {
-                this._importChildren( Imports );
-                this._Children = this._Children.sort( PatricaTrieNodeBase.sortChildes );
-                return ( ++Position )
-            }
-        }
+		while ( Nodes.length > Position )
+		{
+			ImportNode = PatricaTrieNodeEx._loadFromString( Nodes, Position, this, ValueDeserializer );
+			Position = ImportNode[ 0 ];
+			Imports.push( ImportNode[ 1 ] );
+			if ( ']' === Nodes.charAt( Position ) )
+			{
+				this._importChildren( Imports );
+				this._Children = this._Children.sort( PatricaTrieNodeBase.sortChildes );
+				return ( ++Position );
+			}
+		}
 
-        throw new ValueErrorException( `Unexpected end of string @position ${ Position }.` );
-    }
+		throw new ValueErrorException( `Unexpected end of string @position ${ Position }.` );
+	}
 
 	static _loadFromString( NodeString, Position, Parent, ValueDeserializer )
-    {
-        let LastPosition, KeyLength, Key, ValueLength, Value, Node;
+	{
+		let LastPosition, KeyLength, Key, ValueLength, Value, Node;
 
-        if ( '[' !== NodeString.charAt( Position ) )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ NodeString.charAt( Position ) } at position ${ Position }.` );
-        }
+		if ( '[' !== NodeString.charAt( Position ) )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ NodeString.charAt( Position ) } at position ${ Position }.` );
+		}
 
-        Position++;
-        LastPosition = Position;
-        while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
-        {
-            Position++;
-        }
+		Position++;
+		LastPosition = Position;
+		while ( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
+		{
+			Position++;
+		}
 
-        KeyLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
+		// eslint-disable-next-line
+		KeyLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
 
-        if( true === isNaN( KeyLength ) || 0 === KeyLength )
-        {
-            throw new ValueErrorException( `Illegal key length @position ${ LastPosition }.` );
-        }
+		if ( true === isNaN( KeyLength ) || 0 === KeyLength )
+		{
+			throw new ValueErrorException( `Illegal key length @position ${ LastPosition }.` );
+		}
 
-        Position++;
-        Key = NodeString.substring( Position, ( Position + KeyLength ) );
-        Position += KeyLength;
-        LastPosition = Position;
+		Position++;
+		// eslint-disable-next-line
+		Key = NodeString.substring( Position, ( Position + KeyLength ) );
+		Position += KeyLength;
+		LastPosition = Position;
 
-        while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
-        {
-            Position++;
-        }
-        ValueLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
+		while ( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
+		{
+			Position++;
+		}
+		// eslint-disable-next-line
+		ValueLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
 
-        if( true === isNaN( ValueLength ) )
-        {
-            throw new ValueErrorException( `Illegal value length @position ${ LastPosition }.` );
-        }
+		if ( true === isNaN( ValueLength ) )
+		{
+			throw new ValueErrorException( `Illegal value length @position ${ LastPosition }.` );
+		}
 
-        if( 0 === ValueLength )
-        {
-            Node = new PatricaTrieNodeEx( Key, null, Parent );
-            Node.unsetEnd();
-        }
-        else
-        {
-            Position++;
-            Value = ValueDeserializer( NodeString.substring( Position, ( Position + ValueLength ) ) );
-            Node = new PatricaTrieNodeEx( Key, Value, Parent );
-            Position += ValueLength;
-        }
+		if ( 0 === ValueLength )
+		{
+			Node = new PatricaTrieNodeEx( Key, null, Parent );
+			Node.unsetEnd();
+		}
+		else
+		{
+			Position++;
+			// eslint-disable-next-line
+			Value = ValueDeserializer( NodeString.substring( Position, ( Position + ValueLength ) ) );
+			Node = new PatricaTrieNodeEx( Key, Value, Parent );
+			Position += ValueLength;
+		}
 
-        if( ']' !== NodeString.charAt( Position ) )
-        {
-            return [ Node._fromString( NodeString, Position, ValueDeserializer ), Node ];
-        }
-        else
-        {
-            return [ ( ++Position ), Node ];
-        }
-    }
+		if ( ']' !== NodeString.charAt( Position ) )
+		{
+			return [ Node._fromString( NodeString, Position, ValueDeserializer ), Node ];
+		}
+		else
+		{
+			return [ ( ++Position ), Node ];
+		}
+	}
 }

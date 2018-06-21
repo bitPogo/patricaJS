@@ -504,19 +504,20 @@ export class PatricaTrieEx extends PatricaTrieNodeEx
 			throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
 		}
 
+		// eslint-disable-next-line
 		NewTrie = new PatricaTrieEx();
 
-		if( ']' === Trie.charAt( 2 ) )
+		if ( ']' === Trie.charAt( 2 ) )
 		{
 			return NewTrie;
 		}
 
-        // eslint-disable-next-line
+		// eslint-disable-next-line
         Position = NewTrie._fromString( Trie, 2, ValueDeserializer );
 
-		if( Position !== Length )
+		if ( Position !== Length )
 		{
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
 		}
 
 		return NewTrie;

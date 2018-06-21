@@ -361,99 +361,103 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 		}
 	}
 
-    erase()
+	erase()
 	{
 		this._Children = new Array( this.__Size );
 		this._Children.fill( null );
 	}
 
-    _serialize( Output )
-    {
-        let Child;
+	_serialize( Output )
+	{
+		let Child;
 
-        Output.push( `[${this._getKey().length}:${this._getKey()}` );
-        if ( true === this._IsEnding )
-        {
-            Output.push( '1' );
-        }
-        else
-        {
-            Output.push( '0' );
-        }
+		Output.push( `[${this._getKey().length}:${this._getKey()}` );
+		if ( true === this._IsEnding )
+		{
+			Output.push( '1' );
+		}
+		else
+		{
+			Output.push( '0' );
+		}
 
-        for ( Child in this._Children )
-        {
-        	if( null !== this._Children[ Child ] )
+		for ( Child in this._Children )
+		{
+        	if ( null !== this._Children[ Child ] )
         	{
             	this._Children[ Child ]._serialize( Output );
-            }
-        }
+			}
+		}
 
-        Output.push( ']' );
-    }
+		Output.push( ']' );
+	}
 
-    _fromString( Nodes, Position, Size, Normalizer )
-    {
-        let ImportNode;
-        let Imports = new Array( Size );
+	_fromString( Nodes, Position, Size, Normalizer )
+	{
+		let ImportNode;
+		const Imports = new Array( Size );
 
-        while( Nodes.length > Position )
-        {
-            ImportNode = PatricaStaticTrieNode._loadFromString( Nodes, Position, this, Size, Normalizer );
-            Position = ImportNode[ 0 ];
-            Imports[ Normalizer( ImportNode[ 1 ]._getKey().charAt( 0 ) ) ] = ImportNode;
-            if( ']' === Nodes.charAt( Position ) )
-            {
-                this._importChildren( Imports );
-                return ( ++Position )
-            }
-        }
+		while ( Nodes.length > Position )
+		{
+			ImportNode = PatricaStaticTrieNode._loadFromString( Nodes, Position, this, Size, Normalizer );
+			Position = ImportNode[ 0 ];
+			Imports[ Normalizer( ImportNode[ 1 ]._getKey().charAt( 0 ) ) ] = ImportNode;
+			if ( ']' === Nodes.charAt( Position ) )
+			{
+				this._importChildren( Imports );
+				return ( ++Position );
+			}
+		}
 
-        throw new ValueErrorException( `Unexpected end of string @position ${ Position }.` );
-    }
+		throw new ValueErrorException( `Unexpected end of string @position ${ Position }.` );
+	}
 
-    static _loadFromString( NodeString, Position, Parent, Size, Normalizer )
-    {
-        let LastPosition, KeyLength, Key, Node;
+	static _loadFromString( NodeString, Position, Parent, Size, Normalizer )
+	{
+		let LastPosition, KeyLength, Key, Node;
 
-        if ( '[' !== NodeString.charAt( Position ) )
-        {
-            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ NodeString.charAt( Position ) } at position ${ Position }.` );
-        }
+		if ( '[' !== NodeString.charAt( Position ) )
+		{
+			throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ NodeString.charAt( Position ) } at position ${ Position }.` );
+		}
 
-        Position++;
-        LastPosition = Position;
-        while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
-        {
-            Position++;
-        }
+		Position++;
+		// eslint-disable-next-line
+		LastPosition = Position;
+		while ( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
+		{
+			Position++;
+		}
 
-        KeyLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
+		// eslint-disable-next-line
+		KeyLength = parseInt( NodeString.substring( LastPosition, ( Position ) ) );
 
-        if( true === isNaN( KeyLength ) || 0 === KeyLength )
-        {
-            throw new ValueErrorException( `Illegal key length @position ${ LastPosition }.` );
-        }
+		if ( true === isNaN( KeyLength ) || 0 === KeyLength )
+		{
+			throw new ValueErrorException( `Illegal key length @position ${ LastPosition }.` );
+		}
 
-        Position++;
-        Key = NodeString.substring( Position, ( Position + KeyLength ) );
-        Position += KeyLength;
+		Position++;
+		// eslint-disable-next-line
+		Key = NodeString.substring( Position, ( Position + KeyLength ) );
+		Position += KeyLength;
 
-        Node = new PatricaStaticTrieNode( Key, Parent, Size, Normalizer );
-        if( '0' === NodeString.charAt( Position ) )
-        {
-            Node.unsetEnd();
-        }
+		// eslint-disable-next-line
+		Node = new PatricaStaticTrieNode( Key, Parent, Size, Normalizer );
+		if ( '0' === NodeString.charAt( Position ) )
+		{
+			Node.unsetEnd();
+		}
 
-        Position++;
+		Position++;
 
-        if( ']' !== NodeString.charAt( Position ) )
-        {
-            return [ Node._fromString( NodeString, Position ), Node ];
-        }
-        else
-        {
-            return [ ( ++Position ), Node ];
-        }
-    }
+		if ( ']' !== NodeString.charAt( Position ) )
+		{
+			return [ Node._fromString( NodeString, Position ), Node ];
+		}
+		else
+		{
+			return [ ( ++Position ), Node ];
+		}
+	}
 }
