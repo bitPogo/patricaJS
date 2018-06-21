@@ -367,39 +367,100 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 		this._Children.fill( null );
 	}
 
-    _serialize( ValueSerializer, Output )
+    _serialize( Output )
     {
-        let Value, Child;
+        let Child;
 
-        Output.push( `[${this.__Size}:${this._getKey().length}:${this._getKey()}` );
+        Output.push( `[${this._getKey().length}:${this._getKey()}` );
         if ( true === this._IsEnding )
         {
-            Value = ValueSerializer( this.__Value );
-            Output.push( `${Value.length}:${Value}` );
+            Output.push( '1' );
         }
         else
         {
-            Output.push( `0` );
+            Output.push( '0' );
         }
 
         for ( Child in this._Children )
         {
-            this._Children[ Child ]._serialize( ValueSerializer, Output );
+            this._Children[ Child ]._serialize( Output );
         }
 
         Output.push( ']' );
     }
 
-    serialize( ValueSerializer )
+    serialize()
     {
         const Output = [];
-        if ( 'function' !== typeof ValueSerializer )
-        {
-            throw new TypeErrorException( 'Expected a function for value serializer.' );
-        }
 
-        this._serialize( ValueSerializer, Output );
+        this._serialize( Output );
 
         return Output.join( '' );
+    }
+
+    _fromString( Nodes, Position, Size, Normalizer )
+    {
+        let ImportNode;
+        let Imports = [];
+
+        while( Nodes.length > Position )
+        {
+            ImportNode = PatricaStaticTrieNode._loadFromString( Nodes, Position, this, Size, Normalizer );
+            Position = ImportNode[ 0 ];
+            Imports.push( ImportNode[ 1 ] );
+            if( ']' === Nodes.charAt( Position ) )
+            {
+                this._importChildren( Imports );
+                this._Children = this._Children.sort( PatricaTrieNodeBase.sortChildes );
+                return ( ++Position )
+            }
+        }
+
+        throw new ValueErrorException( `Unexpected end of string @position ${ Position }.` );
+    }
+
+    static _loadFromString( NodeString, Position, Parent, Size, Normalizer )
+    {
+        let lastPosition, KeyLength, Key, Node;
+
+        if ( '[' !== NodeString.charAt( Position ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ NodeString.charAt( Position ) } at position ${ Position }.` );
+        }
+
+        Position++;
+        lastPosition = Position;
+        while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
+        {
+            Position++;
+        }
+
+        KeyLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+
+        if( true === isNaN( KeyLength ) || 0 === KeyLength )
+        {
+            throw new ValueErrorException( `Illegal key length @position ${ lastPosition }.` );
+        }
+
+        Position++;
+        Key = NodeString.substring( Position, ( Position + KeyLength ) );
+        Position += KeyLength;
+
+        Node = new PatricaStaticTrieNode( Key, Parent, Size, Normalizer );
+        if( '0' === NodeString.charAt( Position ) )
+        {
+            Node.unsetEnd();
+        }
+
+        Position++;
+
+        if( ']' !== NodeString.charAt( Position ) )
+        {
+            return [ Node._fromString( NodeString, Position ), Node ];
+        }
+        else
+        {
+            return [ ( ++Position ), Node ];
+        }
     }
 }

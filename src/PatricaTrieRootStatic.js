@@ -201,11 +201,6 @@ export class PatricaTrieStatic extends PatricaStaticTrieNode
 		return Output.join( '' );
 	}
 
-	__parser()
-	{
-
-	}
-
 	loadFromString( Trie )
 	{
 		let Length;

@@ -1,4 +1,5 @@
 /* eslint-disable operator-linebreak */
+
 export class PatricaTrie extends PatricaTrieNode
 {
 	__PositionPointer;
@@ -270,7 +271,7 @@ export class PatricaTrie extends PatricaTrieNode
 	serialize()
 	{
 		let Child;
-		const Output = [ '[r', `${this._Children.length}:` ];
+		const Output = [ '[r' ];
 
 		for ( Child in this._Children )
 		{
@@ -281,35 +282,47 @@ export class PatricaTrie extends PatricaTrieNode
 		return Output.join( '' );
 	}
 
-	__parser()
-	{
+	static loadFromString( Trie )
+    {
+        let Length, NewTrie, Position;
+        if ( 'string' !== typeof Trie )
+        {
+            throw new TypeErrorException( 'Expected string to parse.' );
+        }
 
-	}
+        // eslint-disable-next-line
+        Length = Trie.length;
 
-	loadFromString( Trie )
-	{
-		let Length;
-		this.__PositionPointer = 0;
-		if ( 'string' !== typeof Trie )
-		{
-			throw new TypeErrorException( 'Expected string to parse.' );
-		}
-		// eslint-disable-next-line
-		Length = Trie.length;
+        if ( 3 > Length )
+        {
+            throw new ValueErrorException( 'The given string cannot be valid.' );
+        }
 
-		if ( 3 > Length )
-		{
-			throw new ValueErrorException( 'The given string cannot be valid.' );
-		}
+        if ( '[' !== Trie.charAt( 0 ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
+        }
 
-		if ( '[' !== Trie.charAt( 0 ) )
-		{
-			throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ Trie.charAt( 0 ) } at position 0.` );
-		}
+        if ( 'r' !== Trie.charAt( 1 ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
+        }
 
-		if ( 'r' !== Trie.charAt( 1 ) )
-		{
-			throw new ValueErrorException( `The given string is not valid. - Exspecetd r got ${ Trie.charAt( 1 ) } at position 1.` );
-		}
-	}
+        NewTrie = new PatricaTrie();
+
+        if( ']' === Trie.charAt( 2 ) )
+        {
+            return NewTrie;
+        }
+
+        // eslint-disable-next-line
+        Position = NewTrie._fromString( Trie, 2 );
+
+        if( Position !== Length )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd end of string @position ${Position}.` );
+        }
+
+        return NewTrie;
+    }
 }

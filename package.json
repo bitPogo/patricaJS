@@ -1,6 +1,6 @@
 {
   "name": "patricaJS",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A patrica trie libary for javascript - without regex, becx or chai latte.",
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",

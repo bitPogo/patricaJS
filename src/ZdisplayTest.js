@@ -8,8 +8,8 @@ class StringCompare
 }
 
 const Trie = new PatricaTrieEx();
-const Trie3 = new PatricaTrie();
 const Trie2 = new PatricaTrieEx();
+const Trie3 = new PatricaTrie();
 let Trie4;
 Trie.insert( '121', 'a' );
 Trie.insert( '11', 'b' );
@@ -48,10 +48,15 @@ console.log( Trie.insertPreventOverwrite( '123', 'o' ) );
 console.log( Trie.insertPreventOverwrite( '123', 'p' ) );
 Utils.debugObjectPrint( Trie.findByValue( StringCompare ).getKey() );
 console.log( Trie.findAllByValue( StringCompare ) );
-Utils.debugObjectPrint( Trie.getKeysAndValues() );
 console.log( Trie );
+Utils.debugObjectPrint( Trie.getKeysAndValues() );
 Utils.debugObjectPrint( Trie.serialize( JSON.stringify ) );
+
+Trie4 = PatricaTrieEx.loadFromString( Trie.serialize( JSON.stringify ), JSON.parse )
+Utils.debugObjectPrint( Trie4.getKeysAndValues() );
+
 Utils.debugObjectPrint( Trie2.serialize( JSON.stringify ) );
+Trie4 = PatricaTrieEx.loadFromString( Trie2.serialize( JSON.stringify ), JSON.parse );
 
 Trie3.insert( '121', 'a' );
 Trie3.insert( '11', 'b' );
@@ -80,10 +85,11 @@ Trie3.remove( '15' );
 Trie3.remove( '23' );
 Trie3.remove( '2333' );
 Trie.insert( '2', 'q' );
-Utils.debugObjectPrint( Trie3.getKeys() );
 Utils.debugObjectPrint( Trie3.findByKey( '124532' ).getKey() );
+Utils.debugObjectPrint( Trie3.getKeys() );
 console.log( Trie3 );
-Utils.debugObjectPrint( Trie3.serialize( JSON.stringify ) );
+Utils.debugObjectPrint( Trie3.serialize() );
+Trie4 = PatricaTrie.loadFromString( Trie3.serialize() );
+Utils.debugObjectPrint( Trie4.getKeys() );
 
-Trie4 = PatricaTrieEx.loadFromString( '[r[1:13:\"n\"[1:10[5:123413:\"j\"]][1:20[1:13:\"a\"][1:33:\"o\"[3:1233:\"g\"]][4:45323:\"k\"]]][1:23:\"q\"][2:423:\"i\"[4:22223:\"m\"]]]', JSON.parse )
-Utils.debugObjectPrint( Trie4.getKeysAndValues() );
+

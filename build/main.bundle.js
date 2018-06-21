@@ -550,6 +550,7 @@ function _inherits(subClass, superClass) {
 }
 
 /* eslint-disable operator-linebreak */
+
 var PatricaTrieNode = exports.PatricaTrieNode = function (_PatricaTrieNodeBase) {
 	_inherits(PatricaTrieNode, _PatricaTrieNodeBase);
 
@@ -886,9 +887,9 @@ var PatricaTrieNode = exports.PatricaTrieNode = function (_PatricaTrieNodeBase) 
 
 			Output.push('[' + this._getKey().length + ':' + this._getKey());
 			if (true === this._IsEnding) {
-				Output.push(':1');
+				Output.push('1');
 			} else {
-				Output.push(':0');
+				Output.push('0');
 			}
 
 			for (Child in this._Children) {
@@ -906,10 +907,70 @@ var PatricaTrieNode = exports.PatricaTrieNode = function (_PatricaTrieNodeBase) 
 
 			return Output.join('');
 		}
+	}, {
+		key: '_fromString',
+		value: function _fromString(Nodes, Position) {
+			var ImportNode = void 0;
+			var Imports = [];
+
+			while (Nodes.length > Position) {
+				ImportNode = PatricaTrieNode._loadFromString(Nodes, Position, this);
+				Position = ImportNode[0];
+				Imports.push(ImportNode[1]);
+				if (']' === Nodes.charAt(Position)) {
+					this._importChildren(Imports);
+					this._Children = this._Children.sort(PatricaTrieNodeBase.sortChildes);
+					return ++Position;
+				}
+			}
+
+			throw new ValueErrorException('Unexpected end of string @position ' + Position + '.');
+		}
 	}], [{
 		key: 'sortChildes',
 		value: function sortChildes(Child) {
 			return Child._getKey();
+		}
+	}, {
+		key: '_loadFromString',
+		value: function _loadFromString(NodeString, Position, Parent) {
+			var lastPosition = void 0,
+			    KeyLength = void 0,
+			    Key = void 0,
+			    Node = void 0;
+
+			if ('[' !== NodeString.charAt(Position)) {
+				throw new ValueErrorException('The given string is not valid. - Exspecetd [ got ' + NodeString.charAt(Position) + ' at position ' + Position + '.');
+			}
+
+			Position++;
+			lastPosition = Position;
+			while (47 < NodeString.charCodeAt(Position) && 58 > NodeString.charCodeAt(Position)) {
+				Position++;
+			}
+
+			KeyLength = parseInt(NodeString.substring(lastPosition, Position));
+
+			if (true === isNaN(KeyLength) || 0 === KeyLength) {
+				throw new ValueErrorException('Illegal key length @position ' + lastPosition + '.');
+			}
+
+			Position++;
+			Key = NodeString.substring(Position, Position + KeyLength);
+			Position += KeyLength;
+
+			Node = new PatricaTrieNode(Key, Parent);
+			if ('0' === NodeString.charAt(Position)) {
+				Node.unsetEnd();
+			}
+
+			Position++;
+
+			if (']' !== NodeString.charAt(Position)) {
+				return [Node._fromString(NodeString, Position), Node];
+			} else {
+				return [++Position, Node];
+			}
 		}
 	}]);
 
@@ -2927,6 +2988,7 @@ function _inherits(subClass, superClass) {
 }
 
 /* eslint-disable operator-linebreak */
+
 var PatricaTrie = exports.PatricaTrie = function (_PatricaTrieNode) {
 	_inherits(PatricaTrie, _PatricaTrieNode);
 
@@ -3167,7 +3229,7 @@ var PatricaTrie = exports.PatricaTrie = function (_PatricaTrieNode) {
 		key: 'serialize',
 		value: function serialize() {
 			var Child = void 0;
-			var Output = ['[r', this._Children.length + ':'];
+			var Output = ['[r'];
 
 			for (Child in this._Children) {
 				this._Children[Child]._serialize(Output);
@@ -3176,17 +3238,16 @@ var PatricaTrie = exports.PatricaTrie = function (_PatricaTrieNode) {
 
 			return Output.join('');
 		}
-	}, {
-		key: '__parser',
-		value: function __parser() {}
-	}, {
+	}], [{
 		key: 'loadFromString',
 		value: function loadFromString(Trie) {
-			var Length = void 0;
-			this.__PositionPointer = 0;
+			var Length = void 0,
+			    NewTrie = void 0,
+			    Position = void 0;
 			if ('string' !== typeof Trie) {
 				throw new TypeErrorException('Expected string to parse.');
 			}
+
 			// eslint-disable-next-line
 			Length = Trie.length;
 
@@ -3201,6 +3262,21 @@ var PatricaTrie = exports.PatricaTrie = function (_PatricaTrieNode) {
 			if ('r' !== Trie.charAt(1)) {
 				throw new ValueErrorException('The given string is not valid. - Exspecetd r got ' + Trie.charAt(1) + ' at position 1.');
 			}
+
+			NewTrie = new PatricaTrie();
+
+			if (']' === Trie.charAt(2)) {
+				return NewTrie;
+			}
+
+			// eslint-disable-next-line
+			Position = NewTrie._fromString(Trie, 2);
+
+			if (Position !== Length) {
+				throw new ValueErrorException('The given string is not valid. - Exspecetd end of string @position ' + Position + '.');
+			}
+
+			return NewTrie;
 		}
 	}]);
 
@@ -4415,8 +4491,8 @@ var StringCompare = function () {
 StringCompare.Tests = ['a', 'b', 'e', 'f', 'g', 'm'];
 
 var Trie = new PatricaTrieEx();
-var Trie3 = new PatricaTrie();
 var Trie2 = new PatricaTrieEx();
+var Trie3 = new PatricaTrie();
 var Trie4 = void 0;
 Trie.insert('121', 'a');
 Trie.insert('11', 'b');
@@ -4455,10 +4531,15 @@ console.log(Trie.insertPreventOverwrite('123', 'o'));
 console.log(Trie.insertPreventOverwrite('123', 'p'));
 Utils.debugObjectPrint(Trie.findByValue(StringCompare).getKey());
 console.log(Trie.findAllByValue(StringCompare));
-Utils.debugObjectPrint(Trie.getKeysAndValues());
 console.log(Trie);
+Utils.debugObjectPrint(Trie.getKeysAndValues());
 Utils.debugObjectPrint(Trie.serialize(JSON.stringify));
+
+Trie4 = PatricaTrieEx.loadFromString(Trie.serialize(JSON.stringify), JSON.parse);
+Utils.debugObjectPrint(Trie4.getKeysAndValues());
+
 Utils.debugObjectPrint(Trie2.serialize(JSON.stringify));
+Trie4 = PatricaTrieEx.loadFromString(Trie2.serialize(JSON.stringify), JSON.parse);
 
 Trie3.insert('121', 'a');
 Trie3.insert('11', 'b');
@@ -4487,13 +4568,12 @@ Trie3.remove('15');
 Trie3.remove('23');
 Trie3.remove('2333');
 Trie.insert('2', 'q');
-Utils.debugObjectPrint(Trie3.getKeys());
 Utils.debugObjectPrint(Trie3.findByKey('124532').getKey());
+Utils.debugObjectPrint(Trie3.getKeys());
 console.log(Trie3);
-Utils.debugObjectPrint(Trie3.serialize(JSON.stringify));
-
-Trie4 = PatricaTrieEx.loadFromString('[r[1:13:\"n\"[1:10[5:123413:\"j\"]][1:20[1:13:\"a\"][1:33:\"o\"[3:1233:\"g\"]][4:45323:\"k\"]]][1:23:\"q\"][2:423:\"i\"[4:22223:\"m\"]]]', JSON.parse);
-Utils.debugObjectPrint(Trie4.getKeysAndValues());
+Utils.debugObjectPrint(Trie3.serialize());
+Trie4 = PatricaTrie.loadFromString(Trie3.serialize());
+Utils.debugObjectPrint(Trie4.getKeys());
 
 
 

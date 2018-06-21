@@ -1,4 +1,5 @@
 /* eslint-disable operator-linebreak */
+
 export class PatricaTrieNode extends PatricaTrieNodeBase
 {
 	constructor( Key, Parent )
@@ -432,11 +433,11 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
         Output.push( `[${this._getKey().length}:${this._getKey()}` );
         if ( true === this._IsEnding )
         {
-            Output.push( ':1' );
+            Output.push( '1' );
         }
         else
         {
-            Output.push( ':0' );
+            Output.push( '0' );
         }
 
         for ( Child in this._Children )
@@ -454,5 +455,71 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
         this._serialize( Output );
 
         return Output.join( '' );
+    }
+
+    _fromString( Nodes, Position )
+    {
+        let ImportNode;
+        let Imports = [];
+
+        while( Nodes.length > Position )
+        {
+            ImportNode = PatricaTrieNode._loadFromString( Nodes, Position, this );
+            Position = ImportNode[ 0 ];
+            Imports.push( ImportNode[ 1 ] );
+            if( ']' === Nodes.charAt( Position ) )
+            {
+                this._importChildren( Imports );
+                this._Children = this._Children.sort( PatricaTrieNodeBase.sortChildes );
+                return ( ++Position )
+            }
+        }
+
+        throw new ValueErrorException( `Unexpected end of string @position ${ Position }.` );
+    }
+
+    static _loadFromString( NodeString, Position, Parent )
+    {
+        let lastPosition, KeyLength, Key, Node;
+
+        if ( '[' !== NodeString.charAt( Position ) )
+        {
+            throw new ValueErrorException( `The given string is not valid. - Exspecetd [ got ${ NodeString.charAt( Position ) } at position ${ Position }.` );
+        }
+
+        Position++;
+        lastPosition = Position;
+        while( 47 < NodeString.charCodeAt( Position ) && 58 > NodeString.charCodeAt( Position ) )
+        {
+            Position++;
+        }
+
+        KeyLength = parseInt( NodeString.substring( lastPosition, ( Position ) ) );
+
+        if( true === isNaN( KeyLength ) || 0 === KeyLength )
+        {
+            throw new ValueErrorException( `Illegal key length @position ${ lastPosition }.` );
+        }
+
+        Position++;
+        Key = NodeString.substring( Position, ( Position + KeyLength ) );
+        Position += KeyLength;
+
+        Node = new PatricaTrieNode( Key, Parent );
+        if( '0' === NodeString.charAt( Position ) )
+        {
+            Node.unsetEnd();
+        }
+
+        Position++;
+
+        if( ']' !== NodeString.charAt( Position ) )
+        {
+            return [ Node._fromString( NodeString, Position ), Node ];
+        }
+        else
+        {
+            return [ ( ++Position ), Node ];
+        }
     }
 }
