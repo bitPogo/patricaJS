@@ -120,14 +120,17 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 
 	_findByKeyIgnoreCase( LowerKey, Exact, Return )
 	{
-		let Found, CurrentKey;
+		let Found, CurrentKey, UpperKey;
 
 		if ( 0 === LowerKey.length )
 		{
 			return;
 		}
+
 		// eslint-disable-next-line
         CurrentKey = this._getKey().toLowerCase();
+		// eslint-disable-next-line
+		UpperKey = LowerKey.charAt( 0 ).toUpperCase();
 
 		if ( true === CurrentKey.startsWith( LowerKey ) )
 		{
@@ -144,6 +147,7 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 		else if ( LowerKey.startsWith( CurrentKey ) )
 		{
 			LowerKey = LowerKey.substring( this._getKey().length );
+
 			Found = this.__searchForKey( LowerKey.charCodeAt( 0 ) );
 
 			if ( -1 !== Found )
@@ -151,17 +155,20 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 				this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
 			}
 
-			Found = this.__searchForKey( LowerKey.charAt( 0 ).toUpperCase().charCodeAt( 0 ) );
-			if ( -1 !== Found )
+			if ( UpperKey !== LowerKey.charAt( 0 ) )
 			{
-				this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
+				Found = this.__searchForKey( UpperKey.charCodeAt( 0 ) );
+				if ( -1 !== Found )
+				{
+					this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
+				}
 			}
 		}
 	}
 
 	_containsKeyIgnoreCase( LowerKey, Exact = false )
 	{
-		let Return, Found, CurrentKey;
+		let Return, Found, CurrentKey, UpperKey;
 
 		if ( 0 === LowerKey.length )
 		{
@@ -169,6 +176,8 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 		}
 		// eslint-disable-next-line
         CurrentKey = this._getKey().toLowerCase();
+		// eslint-disable-next-line
+		UpperKey = LowerKey.charAt( 0 ).toUpperCase();
 
 		if ( true === CurrentKey.startsWith( LowerKey ) )
 		{
@@ -189,9 +198,9 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 			if ( -1 !== Found )
 			{
 				Return = this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
-				if ( false === Return )
+				if ( false === Return &&  UpperKey !== LowerKey.charAt( 0 ) )
 				{
-					Found = this.__searchForKey( LowerKey.charAt( 0 ).toUpperCase().charCodeAt( 0 ) );
+					Found = this.__searchForKey( UpperKey.charCodeAt( 0 ) );
 					if ( -1 !== Found )
 					{
 						return this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
@@ -200,7 +209,7 @@ export class PatricaTrieNode extends PatricaTrieNodeBase
 
 				return Return;
 			}
-			else
+			else if( UpperKey !== LowerKey.charAt( 0 ) )
 			{
 				Found = this.__searchForKey( LowerKey.charAt( 0 ).toUpperCase().charCodeAt( 0 ) );
 				if ( -1 !== Found )

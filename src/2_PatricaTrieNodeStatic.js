@@ -98,13 +98,15 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 
 	_findByKeyIgnoreCase( LowerKey, Exact, Return )
 	{
-		let Found, CurrentKey;
+		let Found, CurrentKey, UpperKey;
 		if ( 0 === LowerKey.length )
 		{
 			return null;
 		}
 		// eslint-disable-next-line
 		CurrentKey = this._getKey().toLowerCase();
+		// eslint-disable-next-line
+		UpperKey = LowerKey.charAt( 0 ).toUpperCase();
 
 		if ( true === CurrentKey.startsWith( LowerKey ) )
 		{
@@ -128,18 +130,21 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 				this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
 			}
 
-			Found = this.__Normalizer( LowerKey.charAt( 0 ).toUpperCase() );
-
-			if ( -1 < Found && this.__Size > Found )
+			if ( UpperKey !== LowerKey.charAt( 0 ) )
 			{
-				this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
+				Found = this.__Normalizer( LowerKey.charAt( 0 ).toUpperCase() );
+
+				if ( -1 < Found && this.__Size > Found )
+				{
+					this._Children[ Found ]._findByKeyIgnoreCase( LowerKey, Exact, Return );
+				}
 			}
 		}
 	}
 
 	_containsKeyIgnoreCase( LowerKey, Exact = false )
 	{
-		let Return, Found, CurrentKey;
+		let Return, Found, CurrentKey, UpperKey;
 
 		if ( 0 === LowerKey.length )
 		{
@@ -147,6 +152,8 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 		}
 		// eslint-disable-next-line
 		CurrentKey = this._getKey().toLowerCase();
+		// eslint-disable-next-line
+		UpperKey = LowerKey.charAt( 0 ).toUpperCase();
 
 		if ( true === CurrentKey.startsWith( LowerKey ) )
 		{
@@ -167,7 +174,7 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 			if ( -1 < Found && this.__Size > Found )
 			{
 				Return = this._Children[ Found ]._containsKeyIgnoreCase( LowerKey, Exact );
-				if ( false === Return )
+				if ( false === Return && UpperKey !== LowerKey.charAt( 0 ) )
 				{
 					Found = this.__Normalizer( LowerKey.charAt( 0 ) );
 
@@ -179,7 +186,7 @@ export class PatricaStaticTrieNode extends PatricaTrieNodeBase
 
 				return Return;
 			}
-			else
+			else if ( UpperKey !== LowerKey.charAt( 0 ) )
 			{
 				Found = this.__Normalizer( LowerKey.charAt( 0 ) );
 
